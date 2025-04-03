@@ -1,0 +1,4 @@
+[project]
+name = "prj_spy"
+version = "0.1.0"
+dependencies = ["django"]
