@@ -4,7 +4,6 @@ services:
   web:
     build: .
     command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
-    # command: python manage.py runserver
     volumes:
       - static_volume:/app/static
       - media_volume:/app/media
@@ -18,12 +17,23 @@ services:
     volumes:
       - static_volume:/app/static
       - media_volume:/app/media
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx:/etc/nginx/conf.d  # Папка с конфигами
+      - ./certbot/www:/var/www/certbot  # Для проверки домена
+      - ./certbot/conf:/etc/letsencrypt  # Сертификаты
     ports:
       - "80:80"
-      - "443:443"  # Для HTTPS (если нужно)
+      - "443:443"
     depends_on:
       - web
+    networks:
+      - backend-network
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    command: certonly --webroot -w /var/www/certbot --email two-potato@yandex.ru --agree-tos --no-eff-email -d glasshalf.ru --dry-run  # Удалите --dry-run после теста
     networks:
       - backend-network
 
