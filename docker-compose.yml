@@ -38,7 +38,7 @@ services:
     volumes:
       - ./certbot/www:/var/www/certbot
       - ./certbot/conf:/etc/letsencrypt
-    command: certonly --webroot -w /var/www/certbot --email two-potato@yandex.ru --agree-tos --no-eff-email -d glasshalf.ru
+    command: certonly   --non-interactive --webroot -w /var/www/certbot --email two-potato@yandex.ru --agree-tos --no-eff-email -d glasshalf.ru
     networks:
       - backend-network
 

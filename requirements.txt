@@ -7,3 +7,4 @@ sqlparse
 gunicorn
 # aiogram
 whitenoise
+django-htmx
