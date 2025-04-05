@@ -4,5 +4,6 @@ django
 h11
 python-dotenv
 sqlparse
-uvicorn
 gunicorn
+# aiogram
+whitenoise

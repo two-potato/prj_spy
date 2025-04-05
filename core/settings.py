@@ -56,6 +56,13 @@ TEMPLATES = [
     },
 ]
 
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+    }
+}
+
 WSGI_APPLICATION = "core.wsgi.application"
 ASGI_APPLICATION = "core.asgi.application"
 
@@ -74,6 +81,15 @@ USE_TZ = True
 
 # Статические файлы
 STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),  # Путь к вашим статическим файлам
+]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+TRACK_IGNORE_STATUS_CODES = [400, 404, 403, 405, 410, 500]
+TRACKING_ANALYZER_ENABLE_GEOLOCATION = True
+TRACKING_ANALYZER_IPSTACK_ACCESS_KEY = "4ec7c3d49be724c6c3b69eaa5e4134ed"

@@ -3,10 +3,15 @@ version: '3.9'
 services:
   web:
     build: .
-    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    # command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput --clear &&
+             gunicorn --bind 0.0.0.0:8000 --workers 3 core.wsgi:application"
     volumes:
       - static_volume:/app/static
       - media_volume:/app/media
+      - database_volume:/app/db
     env_file:
       - .env
     networks:
@@ -33,13 +38,14 @@ services:
     volumes:
       - ./certbot/www:/var/www/certbot
       - ./certbot/conf:/etc/letsencrypt
-    command: certonly --webroot -w /var/www/certbot --email two-potato@yandex.ru --agree-tos --no-eff-email -d glasshalf.ru --dry-run  # Удалите --dry-run после теста
+    command: certonly --webroot -w /var/www/certbot --email two-potato@yandex.ru --agree-tos --no-eff-email -d glasshalf.ru
     networks:
       - backend-network
 
 volumes:
   static_volume:
   media_volume:
+  database_volume:
 
 networks:
   backend-network:

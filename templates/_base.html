@@ -1,13 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
+
 <head>
+  {% load static %}
   <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+
+  <!-- SEO -->
+  <title>{% block title %}The Glass Is Half{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Test world{% endblock %}">
+  <meta name="keywords" content="ключевые, слова, сайт, тематика">
+  <meta name="author" content="2potato">
+
+  <!-- Безопасность -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+
+  <!-- Open Graph (для соцсетей) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{% block og_title %}Мой сайт{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Описание сайта для соцсетей{% endblock %}">
+  <meta property="og:image" content="{% static 'images/og-image.jpg' %}">
+  <meta property="og:url" content="https://yourdomain.com">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block twitter_title %}Мой сайт{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Описание для Twitter{% endblock %}">
+  <meta name="twitter:image" content="{% static 'images/twitter-image.jpg' %}">
+
+  <!-- Favicon -->
+  <link rel="icon" href="{% static 'images/favicon/favicon.ico' %}" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon/favicon-16x16.png' %}">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  {% comment %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}"> {% endcomment %}
 </head>
-<body>
-  {% block content %}
-  
-  {% endblock content %}
+
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Навигация -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+    <div class="container">
+      <a class="navbar-brand" href="/">The glass is half</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Главная</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">О нас</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/contact/">Контакты</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Контент -->
+  <main class="container flex-grow-1">
+    {% block content %}
+    <!-- Основной контент -->
+    {% endblock %}
+  </main>
+
+  <!-- Футер всегда внизу -->
+  <footer class="bg-dark text-white py-4 mt-auto">
+    <div class="container text-center">
+      <p class="mb-0">&copy; {% now "Y" %} 2potato. All rights reserved.</p>
+    </div>
+  </footer>
+
+  {% block scripts %}
+  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  {% endblock %}
 </body>
+
 </html>
