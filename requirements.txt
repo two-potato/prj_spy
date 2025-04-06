@@ -8,3 +8,4 @@ gunicorn
 # aiogram
 whitenoise
 django-htmx
+django-prometheus

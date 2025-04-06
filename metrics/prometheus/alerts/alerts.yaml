@@ -1,0 +1,131 @@
+groups:
+- name: django-alerts
+  rules:
+  # HTTP Errors
+  - alert: High5xxErrorRate
+    expr: rate(django_http_requests_total_by_view_method{status=~"5.."}[5m]) > 0.05
+    for: 5m
+    labels:
+      severity: critical
+      service: django
+    annotations:
+      summary: "High 5xx error rate ({{ $value }} errors/s)"
+      description: "5xx error rate exceeds 5% for service {{ $labels.service }}"
+
+  - alert: High4xxErrorRate
+    expr: rate(django_http_requests_total_by_view_method{status=~"4.."}[5m]) > 0.1
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      description: "High client-side errors (4xx) detected: {{ $value }} errors/s"
+
+  # Latency
+  - alert: HighRequestLatency
+    expr: |
+      histogram_quantile(0.95, rate(django_http_requests_duration_seconds_bucket[5m])) > 3
+    labels:
+      severity: critical
+    annotations:
+      summary: "High request latency (p95 > 3s)"
+      
+  # Database
+  - alert: DatabaseConnectionPool80Percent
+    expr: |
+      pg_stat_activity_count / pg_settings_max_connections > 0.8
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      description: "Database connection pool usage over 80% ({{ $value }}%)"
+
+  - alert: SlowSQLQueries
+    expr: |
+      rate(pg_stat_statements_total_time_seconds[5m]) > 5
+    labels:
+      severity: warning
+    annotations:
+      description: "Slow SQL queries detected (>5s)"
+
+  # Celery
+  - alert: CeleryQueueBacklog
+    expr: |
+      celery_tasks_count > 100
+    for: 15m
+    labels:
+      severity: critical
+    annotations:
+      description: "Celery queue backlog ({{ $value }} tasks)"
+
+  - alert: CeleryTaskFailures
+    expr: |
+      rate(celery_tasks_failed_total[1h]) > 5
+    labels:
+      severity: warning
+    annotations:
+      description: "High Celery task failure rate ({{ $value }}/s)"
+
+  # Cache (Redis)
+  - alert: RedisMemoryHighUsage
+    expr: |
+      redis_memory_used_bytes / redis_memory_max_bytes > 0.85
+    labels:
+      severity: critical
+    annotations:
+      description: "Redis memory usage over 85% ({{ $value }}%)"
+
+  - alert: LowRedisHitRate
+    expr: |
+      rate(redis_keyspace_hits_total[5m]) / (rate(redis_keyspace_hits_total[5m]) + rate(redis_keyspace_misses_total[5m])) < 0.5
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      description: "Low Redis cache hit ratio ({{ $value }}%)"
+
+  # System
+  - alert: HighCPUUsage
+    expr: |
+      100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      description: "CPU usage over 90% ({{ $value }}%)"
+
+  - alert: HighMemoryUsage
+    expr: |
+      (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      description: "Memory usage over 90% ({{ $value }}%)"
+
+  # Django Specific
+  - alert: DjangoExceptions
+    expr: |
+      rate(django_exceptions_total[5m]) > 5
+    labels:
+      severity: warning
+    annotations:
+      description: "High exception rate ({{ $value }}/s)"
+
+  - alert: UnappliedMigrations
+    expr: |
+      django_migrations_unapplied > 0
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      description: "Unapplied database migrations detected"
+
+  # Custom Business Logic
+  - alert: UserRegistrationDrop
+    expr: |
+      rate(django_user_signups_total[1h]) < 0.5
+    for: 2h
+    labels:
+      severity: warning
+    annotations:
+      description: "User registration rate dropped below 0.5/s"

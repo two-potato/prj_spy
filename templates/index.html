@@ -3,8 +3,9 @@
 
 <form method="post" action="">
   {% csrf_token %}
-  <button type="submit" name="choice" value="accept" class="btn btn-success">Принять</button>
-  <button type="submit" name="choice" value="reject" class="btn btn-danger">Отклонить</button>
+  <button type="submit" class="btn btn-success">Принять</button>
+  {% comment %} <button type="submit" name="choice" value="reject" class="btn btn-danger">Отклонить</button>
+  {% endcomment %}
 </form>
 
 {% endblock content %}

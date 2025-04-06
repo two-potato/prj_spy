@@ -2,8 +2,9 @@ version: '3.9'
 
 services:
   web:
-    build: .
-    # command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: >
       sh -c "python manage.py migrate --noinput &&
              python manage.py collectstatic --noinput --clear &&
@@ -15,32 +16,35 @@ services:
     env_file:
       - .env
     networks:
-      - backend-network
+      - backend
+      - monitoring
 
   nginx:
     image: nginx:1.23-alpine
     volumes:
       - static_volume:/app/static
       - media_volume:/app/media
-      - ./nginx:/etc/nginx/conf.d  # Папка с конфигами
-      - ./certbot/www:/var/www/certbot  # Для проверки домена
-      - ./certbot/conf:/etc/letsencrypt  # Сертификаты
+      - ./nginx:/etc/nginx/conf.d
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
     ports:
       - "80:80"
       - "443:443"
+    networks:
+      - backend
+      - monitoring
     depends_on:
       - web
-    networks:
-      - backend-network
 
   certbot:
     image: certbot/certbot:latest
     volumes:
       - ./certbot/www:/var/www/certbot
       - ./certbot/conf:/etc/letsencrypt
-    command: certonly   --non-interactive --webroot -w /var/www/certbot --email two-potato@yandex.ru --agree-tos --no-eff-email -d glasshalf.ru
+    command: certonly --non-interactive --webroot -w /var/www/certbot --email two-potato@yandex.ru --agree-tos --no-eff-email -d glasshalf.ru
     networks:
-      - backend-network
+      - backend
+      - monitoring
 
 volumes:
   static_volume:
@@ -48,5 +52,4 @@ volumes:
   database_volume:
 
 networks:
-  backend-network:
-    driver: bridge
+  backend:

@@ -10,14 +10,16 @@ from dotenv import load_dotenv
 # Загрузка переменных окружения из .env
 load_dotenv()
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+print(BASE_DIR)
 # Безопасное получение настроек
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-key-for-dev")
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
+# DEBUG = True
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+# ALLOWED_HOSTS = [*]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -28,9 +30,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "apps.teletest",
     "django_htmx",
+    "django_prometheus",
 ]
 
 MIDDLEWARE = [
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -39,6 +43,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -91,7 +96,3 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-TRACK_IGNORE_STATUS_CODES = [400, 404, 403, 405, 410, 500]
-TRACKING_ANALYZER_ENABLE_GEOLOCATION = True
-TRACKING_ANALYZER_IPSTACK_ACCESS_KEY = "4ec7c3d49be724c6c3b69eaa5e4134ed"
